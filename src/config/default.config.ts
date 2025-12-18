@@ -1,5 +1,5 @@
 /**
- * @audiencelab/manus-validation-kit
+ * @roALAB1/manus-validation-kit
  * Default Configuration
  */
 

@@ -1,5 +1,5 @@
 /**
- * @audiencelab/manus-validation-kit
+ * @roALAB1/manus-validation-kit
  * Skeptical Reasoning Engine (Layer 2)
  * 
  * Analyzes architecture for scalability issues, blind spots, and tech stack conflicts.

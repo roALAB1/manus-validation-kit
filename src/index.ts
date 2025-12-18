@@ -1,5 +1,5 @@
 /**
- * @audiencelab/manus-validation-kit
+ * @roALAB1/manus-validation-kit
  * 
  * A 5-layer production-ready validation and optimization system
  * for AI-assisted development.

@@ -1,6 +1,6 @@
 # Using the Validation Kit with Manus AI
 
-This document provides specific instructions for integrating the `@audiencelab/manus-validation-kit` into your Manus AI workflows. By following this guide, you can ensure that every task in Manus that involves code changes is automatically validated for quality, architecture, and efficiency.
+This document provides specific instructions for integrating the `@roALAB1/manus-validation-kit` into your Manus AI workflows. By following this guide, you can ensure that every task in Manus that involves code changes is automatically validated for quality, architecture, and efficiency.
 
 ## The Goal
 
@@ -17,7 +17,7 @@ We want to establish a **continuous validation loop** where:
 
 First, ensure your repository has the validation kit installed. If not, ask Manus to do it:
 
-> "Clone my repository `roALAB1/my-app` and integrate the `@audiencelab/manus-validation-kit`. Initialize it and commit the changes."
+> "Clone my repository `roALAB1/my-app` and integrate the `@roALAB1/manus-validation-kit`. Initialize it and commit the changes."
 
 This will add the kit as a dependency, create the `.validation/` config directory, and add the npm scripts.
 
@@ -115,7 +115,7 @@ And provide a report on architectural critiques, scalability phases, and blind s
 ### "Validation kit not found"
 
 The kit is not installed. Ask Manus:
-> "Install the `@audiencelab/manus-validation-kit` package and run `npx manus-validate init`."
+> "Install the `@roALAB1/manus-validation-kit` package and run `npx manus-validate init`."
 
 ### "Validation keeps failing on the same issue"
 

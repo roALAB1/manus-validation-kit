@@ -1,5 +1,5 @@
 {
-  "name": "@audiencelab/manus-validation-kit",
+  "name": "@roALAB1/manus-validation-kit",
   "version": "1.0.0",
   "description": "A 5-layer production-ready validation and optimization system for AI-assisted development. Validates code correctness, architectural soundness, scalability, and token efficiency.",
   "main": "dist/index.js",

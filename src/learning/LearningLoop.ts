@@ -1,5 +1,5 @@
 /**
- * @audiencelab/manus-validation-kit
+ * @roALAB1/manus-validation-kit
  * Learning Loop Engine (Layer 3)
  * 
  * Tracks validation failures, detects patterns, and enables auto-fixing

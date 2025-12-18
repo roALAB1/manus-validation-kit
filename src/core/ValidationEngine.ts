@@ -1,5 +1,5 @@
 /**
- * @audiencelab/manus-validation-kit
+ * @roALAB1/manus-validation-kit
  * Core Validation Engine
  * 
  * The heart of the validation system. Orchestrates all 10 validators

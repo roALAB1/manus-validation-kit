@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * @audiencelab/manus-validation-kit
+ * @roALAB1/manus-validation-kit
  * Command Line Interface
  * 
  * Usage:

@@ -2,7 +2,7 @@
 
 > How to call the validation engine from other apps and process the output.
 
-This guide provides detailed instructions for integrating the `@audiencelab/manus-validation-kit` into your existing applications and CI/CD pipelines. It covers how to run automated validation and, most importantly, how to capture and use the resulting analysis reports.
+This guide provides detailed instructions for integrating the `@roALAB1/manus-validation-kit` into your existing applications and CI/CD pipelines. It covers how to run automated validation and, most importantly, how to capture and use the resulting analysis reports.
 
 ## Core Concepts
 
@@ -32,7 +32,7 @@ This is the simplest way to automate validation. You run a command and check its
 ### Step 1: Install the Kit
 
 ```bash
-npm install @audiencelab/manus-validation-kit --save-dev
+npm install @roALAB1/manus-validation-kit --save-dev
 ```
 
 ### Step 2: Initialize in Your Project
@@ -97,7 +97,7 @@ Use the programmatic API when you need to work with the validation results direc
 ### Step 1: Install the Kit
 
 ```bash
-npm install @audiencelab/manus-validation-kit --save-dev
+npm install @roALAB1/manus-validation-kit --save-dev
 ```
 
 ### Step 2: Use the `validate` Function
@@ -110,8 +110,8 @@ This script runs the validation and then processes the report object to create a
 
 ```typescript
 // file: ./scripts/run-custom-validation.ts
-import { validate } from "@audiencelab/manus-validation-kit";
-import type { ValidationReport, ConsensusIssue } from "@audiencelab/manus-validation-kit";
+import { validate } from "@roALAB1/manus-validation-kit";
+import type { ValidationReport, ConsensusIssue } from "@roALAB1/manus-validation-kit";
 import * as fs from "fs";
 
 async function runValidationAndGenerateSummary() {

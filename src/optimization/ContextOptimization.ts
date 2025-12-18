@@ -1,5 +1,5 @@
 /**
- * @audiencelab/manus-validation-kit
+ * @roALAB1/manus-validation-kit
  * Context Optimization Engine (Layer 4)
  * 
  * Manages context window efficiency through automatic cleanup,

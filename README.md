@@ -1,8 +1,8 @@
-# @audiencelab/manus-validation-kit
+# @roALAB1/manus-validation-kit
 
 > A 5-layer production-ready validation and optimization system for AI-assisted development.
 
-[![npm version](https://badge.fury.io/js/@audiencelab%2Fmanus-validation-kit.svg)](https://www.npmjs.com/package/@audiencelab/manus-validation-kit)
+[![npm version](https://badge.fury.io/js/@roALAB1%2Fmanus-validation-kit.svg)](https://www.npmjs.com/package/@roALAB1/manus-validation-kit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
@@ -22,7 +22,7 @@ This validation kit goes far beyond traditional code linting. It provides a **5-
 ## Installation
 
 ```bash
-npm install @audiencelab/manus-validation-kit --save-dev
+npm install @roALAB1/manus-validation-kit --save-dev
 ```
 
 ## Quick Start
@@ -185,7 +185,7 @@ Configuration is stored in `.validation/config.json`:
 ## Programmatic Usage
 
 ```typescript
-import { validate, ValidationEngine, SkepticalReasoningEngine } from '@audiencelab/manus-validation-kit';
+import { validate, ValidationEngine, SkepticalReasoningEngine } from '@roALAB1/manus-validation-kit';
 
 // Quick validation
 const results = await validate('/path/to/project', {
