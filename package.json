@@ -1,0 +1,82 @@
+{
+  "name": "@audiencelab/manus-validation-kit",
+  "version": "1.0.0",
+  "description": "A 5-layer production-ready validation and optimization system for AI-assisted development. Validates code correctness, architectural soundness, scalability, and token efficiency.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "manus-validate": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "validate": "ts-node src/cli.ts validate",
+    "validate:all": "ts-node src/cli.ts validate --all",
+    "validate:schemas": "ts-node src/cli.ts validate --validator=zod",
+    "validate:types": "ts-node src/cli.ts validate --validator=typescript",
+    "validate:lint": "ts-node src/cli.ts validate --validator=eslint,biome",
+    "validate:test": "ts-node src/cli.ts validate --validator=jest",
+    "validate:security": "ts-node src/cli.ts validate --validator=security",
+    "validate:architecture": "ts-node src/cli.ts validate --layer=skeptical",
+    "validate:learn": "ts-node src/cli.ts learn",
+    "validate:cleanup": "ts-node src/cli.ts cleanup",
+    "init": "ts-node src/cli.ts init",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "validation",
+    "manus",
+    "ai",
+    "code-quality",
+    "typescript",
+    "linting",
+    "testing",
+    "architecture",
+    "scalability",
+    "token-optimization"
+  ],
+  "author": "AudienceLab",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roALAB1/manus-validation-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/roALAB1/manus-validation-kit/issues"
+  },
+  "homepage": "https://github.com/roALAB1/manus-validation-kit#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "glob": "^10.3.10",
+    "ora": "^7.0.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.55.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.1.0",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.2"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
+  },
+  "files": [
+    "dist",
+    "templates",
+    "hooks",
+    "ci"
+  ]
+}

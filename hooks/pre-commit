@@ -1,0 +1,23 @@
+#!/bin/sh
+# Manus Validation Kit - Pre-commit Hook
+# This hook runs validation before each commit
+
+echo "🔍 Running Manus Validation..."
+
+# Run code validation in CI mode
+npx manus-validate validate --ci
+
+# Capture exit code
+VALIDATION_EXIT=$?
+
+if [ $VALIDATION_EXIT -ne 0 ]; then
+    echo ""
+    echo "❌ Validation failed. Commit blocked."
+    echo ""
+    echo "Fix the issues above or use --no-verify to skip (not recommended)."
+    exit 1
+fi
+
+echo ""
+echo "✅ Validation passed. Proceeding with commit."
+exit 0

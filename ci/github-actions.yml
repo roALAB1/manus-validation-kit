@@ -1,0 +1,76 @@
+# Manus Validation Kit - GitHub Actions Workflow
+# Copy this file to .github/workflows/validation.yml in your project
+
+name: Manus Validation
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  validate:
+    name: Run Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Layer 1 - Code Validation
+        run: npx manus-validate validate --ci
+        continue-on-error: false
+
+      - name: Layer 2 - Skeptical Reasoning
+        run: npx manus-validate validate --layer=skeptical --ci
+        continue-on-error: true  # Advisory only, doesn't block
+
+      - name: Layer 3 - Learning Report
+        run: npx manus-validate learn
+        continue-on-error: true
+
+      - name: Upload Validation Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: validation-reports
+          path: .validation/reports/
+          retention-days: 30
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: validate
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run security audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Run Snyk scan
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
