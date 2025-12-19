@@ -2,7 +2,7 @@
 
 > A 5-layer production-ready validation and optimization system for AI-assisted development.
 
-[![npm version](https://badge.fury.io/js/@roALAB1%2Fmanus-validation-kit.svg)](https://www.npmjs.com/package/@roALAB1/manus-validation-kit)
+[![GitHub](https://img.shields.io/badge/install-from%20GitHub-blue)](https://github.com/roALAB1/manus-validation-kit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
@@ -21,8 +21,17 @@ This validation kit goes far beyond traditional code linting. It provides a **5-
 
 ## Installation
 
+> **Important:** This package is installed directly from GitHub, not npm.
+
 ```bash
-npm install @roALAB1/manus-validation-kit --save-dev
+# npm
+npm install "@roALAB1/manus-validation-kit@github:roALAB1/manus-validation-kit" --save-dev
+
+# pnpm
+pnpm add "@roALAB1/manus-validation-kit@github:roALAB1/manus-validation-kit" --save-dev
+
+# yarn
+yarn add "@roALAB1/manus-validation-kit@github:roALAB1/manus-validation-kit" --dev
 ```
 
 ## Quick Start
