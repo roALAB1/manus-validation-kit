@@ -1,0 +1,65 @@
+# GitHub Actions Release Workflow
+# 
+# IMPORTANT: To use this workflow, you need to manually copy it to .github/workflows/release.yml
+# This is because the GitHub App does not have permission to create workflow files.
+#
+# Steps:
+# 1. Copy this file to .github/workflows/release.yml in your repository
+# 2. Commit and push the change manually or via GitHub web interface
+#
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this release:
+            - See CHANGELOG.md for details
+          draft: false
+          prerelease: false
+
+  publish:
+    name: Publish to npm (Optional)
+    needs: release
+    runs-on: ubuntu-latest
+    # Uncomment the following line to enable npm publishing
+    # if: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      # Uncomment to enable npm publishing
+      # - name: Publish to npm
+      #   run: npm publish --access public
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
