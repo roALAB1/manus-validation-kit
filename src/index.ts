@@ -1,7 +1,7 @@
 /**
  * @roALAB1/manus-validation-kit
  * 
- * A 5-layer production-ready validation and optimization system
+ * A 6-layer production-ready validation and optimization system
  * for AI-assisted development.
  * 
  * Layers:
@@ -10,6 +10,7 @@
  * 3. Learning Loop - Pattern detection & auto-fixing
  * 4. Context Optimization - Cleanup & compression
  * 5. Token Efficiency - Code as API, Serena, Self-Spec, S²-MAD
+ * 6. Codebase Audit - Evidence-based bloat detection & cleanup
  */
 
 // Core engines
@@ -19,6 +20,10 @@ export { SkepticalReasoningEngine } from './core/SkepticalReasoningEngine';
 // Learning & optimization
 export { LearningLoop } from './learning/LearningLoop';
 export { ContextOptimization } from './optimization/ContextOptimization';
+
+// Audit (Layer 6)
+export { CodebaseAuditEngine } from './audit/CodebaseAuditEngine';
+export { AuditReportGenerator } from './audit/AuditReportGenerator';
 
 // Configuration
 export {
@@ -77,6 +82,20 @@ export type {
   ServiceResult,
 } from './types';
 
+// Audit types (Layer 6)
+export type {
+  AuditConfig,
+  AuditReport,
+  AuditSummary,
+  Finding,
+  FindingType,
+  ConfidenceCategory,
+  Evidence,
+  KeepList,
+  CleanupPlan,
+  CleanupAction,
+} from './types/audit';
+
 // Utility functions
 export {
   createSuccessResult,
@@ -122,4 +141,51 @@ export async function validate(projectPath: string, options?: {
   }
 
   return results;
+}
+
+/**
+ * Quick start function to run codebase audit
+ */
+export async function audit(projectPath: string, options?: {
+  type?: 'all' | 'dependencies' | 'files' | 'exports' | 'duplicates';
+  generateCleanup?: boolean;
+}) {
+  const { CodebaseAuditEngine } = await import('./audit/CodebaseAuditEngine');
+  const { AuditReportGenerator } = await import('./audit/AuditReportGenerator');
+
+  // Configure tools based on type
+  const type = options?.type || 'all';
+  const toolConfig = {
+    depcheck: { enabled: type === 'all' || type === 'dependencies' },
+    'ts-prune': { enabled: type === 'all' || type === 'exports' },
+    unimported: { enabled: type === 'all' || type === 'files' },
+    jscpd: { enabled: type === 'all' || type === 'duplicates', minLines: 10 },
+    madge: { enabled: type === 'all' },
+    'cost-of-modules': { enabled: false },
+  };
+
+  const auditEngine = new CodebaseAuditEngine(projectPath, { tools: toolConfig });
+  const report = await auditEngine.audit();
+  const reportGenerator = new AuditReportGenerator(report);
+
+  // Save reports
+  const jsonPath = reportGenerator.saveJsonReport();
+  const mdPath = reportGenerator.saveMarkdownReport();
+
+  // Generate cleanup script if requested
+  let cleanupPath: string | undefined;
+  if (options?.generateCleanup) {
+    cleanupPath = reportGenerator.saveCleanupScript();
+  }
+
+  return {
+    report,
+    consoleOutput: reportGenerator.generateConsoleReport(),
+    markdownOutput: reportGenerator.generateMarkdownReport(),
+    files: {
+      json: jsonPath,
+      markdown: mdPath,
+      cleanup: cleanupPath,
+    },
+  };
 }

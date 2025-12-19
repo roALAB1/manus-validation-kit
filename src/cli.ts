@@ -5,8 +5,9 @@
  * 
  * Usage:
  *   manus-validate validate [--all] [--validator=<name>] [--layer=<layer>]
+ *   manus-validate audit [--type=<type>] [--generate-cleanup]
  *   manus-validate learn [--fix]
- *   manus-validate cleanup
+ *   manus-validate cleanup [--confirm]
  *   manus-validate init [--force]
  */
 
@@ -17,13 +18,15 @@ import { ValidationEngine } from './core/ValidationEngine';
 import { SkepticalReasoningEngine } from './core/SkepticalReasoningEngine';
 import { LearningLoop } from './learning/LearningLoop';
 import { ContextOptimization } from './optimization/ContextOptimization';
+import { CodebaseAuditEngine } from './audit/CodebaseAuditEngine';
+import { AuditReportGenerator } from './audit/AuditReportGenerator';
 
 const program = new Command();
 
 program
   .name('manus-validate')
-  .description('5-Layer Validation & Optimization System for AI-Assisted Development')
-  .version('1.0.0');
+  .description('6-Layer Validation & Optimization System for AI-Assisted Development')
+  .version('1.1.0');
 
 // ============================================================================
 // VALIDATE COMMAND
@@ -41,7 +44,7 @@ program
   .action(async (options) => {
     const projectPath = process.cwd();
     
-    console.log('\n🚀 Manus Validation Kit v1.0.0\n');
+    console.log('\n🚀 Manus Validation Kit v1.1.0\n');
     console.log(`📁 Project: ${projectPath}\n`);
 
     let exitCode = 0;
@@ -98,6 +101,89 @@ program
 
     if (options.ci) {
       process.exit(exitCode);
+    }
+  });
+
+// ============================================================================
+// AUDIT COMMAND (Layer 6)
+// ============================================================================
+
+program
+  .command('audit')
+  .description('Run evidence-based codebase audit to find unused code, dependencies, and bloat')
+  .option('-t, --type <type>', 'Audit type (all, dependencies, files, exports, duplicates)', 'all')
+  .option('-o, --output <format>', 'Output format (text, json, markdown)', 'text')
+  .option('--generate-cleanup', 'Generate cleanup script for high-confidence findings')
+  .option('--ci', 'Run in CI mode (exit with error code if high-confidence issues found)')
+  .option('--min-confidence <number>', 'Minimum confidence to report (0-100)', '50')
+  .action(async (options) => {
+    const projectPath = process.cwd();
+    
+    console.log('\n🔍 Manus Validation Kit - Evidence-Based Audit\n');
+    console.log(`📁 Project: ${projectPath}\n`);
+
+    try {
+      // Configure which tools to run based on type
+      const toolConfig: Record<string, boolean> = {
+        depcheck: options.type === 'all' || options.type === 'dependencies',
+        'ts-prune': options.type === 'all' || options.type === 'exports',
+        unimported: options.type === 'all' || options.type === 'files',
+        jscpd: options.type === 'all' || options.type === 'duplicates',
+        madge: options.type === 'all',
+        'cost-of-modules': false,
+      };
+
+      const auditEngine = new CodebaseAuditEngine(projectPath, {
+        tools: {
+          depcheck: { enabled: toolConfig.depcheck },
+          'ts-prune': { enabled: toolConfig['ts-prune'] },
+          unimported: { enabled: toolConfig.unimported },
+          jscpd: { enabled: toolConfig.jscpd, minLines: 10 },
+          madge: { enabled: toolConfig.madge },
+          'cost-of-modules': { enabled: toolConfig['cost-of-modules'] },
+        },
+        thresholds: {
+          minConfidenceToReport: parseInt(options.minConfidence) || 50,
+          minConfidenceToRecommend: 70,
+          staleFileDays: 180,
+        },
+      });
+
+      const report = await auditEngine.audit();
+      const reportGenerator = new AuditReportGenerator(report);
+
+      // Output based on format
+      if (options.output === 'json') {
+        console.log(JSON.stringify(report, null, 2));
+      } else if (options.output === 'markdown') {
+        console.log(reportGenerator.generateMarkdownReport());
+      } else {
+        console.log(reportGenerator.generateConsoleReport());
+      }
+
+      // Save reports
+      const jsonPath = reportGenerator.saveJsonReport();
+      const mdPath = reportGenerator.saveMarkdownReport();
+      console.log(`\n📄 Reports saved:`);
+      console.log(`   JSON: ${path.relative(projectPath, jsonPath)}`);
+      console.log(`   Markdown: ${path.relative(projectPath, mdPath)}`);
+
+      // Generate cleanup script if requested
+      if (options.generateCleanup) {
+        const scriptPath = reportGenerator.saveCleanupScript();
+        console.log(`   Cleanup Script: ${path.relative(projectPath, scriptPath)}`);
+        console.log('\n⚠️  Review the cleanup script before running it!');
+      }
+
+      // CI mode exit code
+      if (options.ci && report.summary.highConfidence > 0) {
+        console.log(`\n❌ Found ${report.summary.highConfidence} high-confidence issues`);
+        process.exit(1);
+      }
+
+    } catch (error) {
+      console.error('\n❌ Audit failed:', error);
+      process.exit(1);
     }
   });
 
@@ -166,12 +252,23 @@ program
 program
   .command('cleanup')
   .description('Run context optimization and cleanup')
-  .action(async () => {
+  .option('--confirm', 'Execute cleanup actions (without this, only shows what would be done)')
+  .option('--dry-run', 'Show what would be cleaned up without making changes')
+  .action(async (options) => {
     const projectPath = process.cwd();
     
     try {
       const contextOpt = new ContextOptimization(projectPath);
-      await contextOpt.cleanup();
+      
+      if (options.dryRun || !options.confirm) {
+        console.log('\n🔍 Cleanup Preview (dry run)\n');
+        console.log('The following actions would be taken:');
+        // Show what would be cleaned
+        await contextOpt.cleanup();
+        console.log('\nRun with --confirm to execute these actions.');
+      } else {
+        await contextOpt.cleanup();
+      }
     } catch (error) {
       console.error('\n❌ Cleanup failed:', error);
       process.exit(1);
@@ -204,6 +301,7 @@ program
       validationDir,
       path.join(validationDir, 'reports'),
       path.join(validationDir, 'archive'),
+      path.join(validationDir, 'audit'),
     ];
 
     for (const dir of dirs) {
@@ -215,7 +313,7 @@ program
 
     // Create default config
     const defaultConfig = {
-      version: '1.0.0',
+      version: '1.1.0',
       validators: {
         typescript: { enabled: true, weight: 0.96 },
         eslint: { enabled: true, weight: 0.92 },
@@ -232,10 +330,49 @@ program
         retentionDays: 30,
         archiveAfterDays: 7,
       },
+      audit: {
+        enabled: true,
+        tools: {
+          depcheck: { enabled: true },
+          'ts-prune': { enabled: true },
+          unimported: { enabled: true },
+          jscpd: { enabled: true, minLines: 10 },
+          madge: { enabled: true },
+        },
+        thresholds: {
+          minConfidenceToReport: 50,
+          minConfidenceToRecommend: 70,
+          staleFileDays: 180,
+        },
+        exclusions: {
+          paths: ['node_modules/', 'dist/', 'build/', '.git/', '__tests__/', '__mocks__/', 'migrations/'],
+          packages: ['@types/*'],
+          patterns: ['*.config.js', '*.config.ts', '*.d.ts', '*.test.ts', '*.spec.ts'],
+        },
+      },
     };
 
     fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2));
     console.log(`  📄 Created .validation/config.json`);
+
+    // Create keep.json for exclusions
+    const keepPath = path.join(validationDir, 'keep.json');
+    const keepContent = {
+      description: 'Files and packages intentionally kept despite appearing unused',
+      files: [],
+      packages: [],
+    };
+    fs.writeFileSync(keepPath, JSON.stringify(keepContent, null, 2));
+    console.log(`  📄 Created .validation/keep.json`);
+
+    // Create patterns.json
+    const patternsPath = path.join(validationDir, 'patterns.json');
+    const patternsContent = {
+      version: '1.0.0',
+      patterns: [],
+    };
+    fs.writeFileSync(patternsPath, JSON.stringify(patternsContent, null, 2));
+    console.log(`  📄 Created .validation/patterns.json`);
 
     // Create .gitignore for validation directory
     const gitignorePath = path.join(validationDir, '.gitignore');
@@ -243,9 +380,13 @@ program
 learning-data.json
 archive/
 reports/
+audit/
+cleanup.sh
 
-# Keep config
+# Keep config files
 !config.json
+!keep.json
+!patterns.json
 `;
     fs.writeFileSync(gitignorePath, gitignoreContent);
     console.log(`  📄 Created .validation/.gitignore`);
@@ -261,6 +402,9 @@ reports/
           'validate': 'manus-validate validate',
           'validate:all': 'manus-validate validate --all',
           'validate:architecture': 'manus-validate validate --layer=skeptical',
+          'validate:audit': 'manus-validate audit',
+          'validate:audit:deps': 'manus-validate audit --type=dependencies',
+          'validate:audit:files': 'manus-validate audit --type=files',
           'validate:learn': 'manus-validate learn',
           'validate:cleanup': 'manus-validate cleanup',
         };
@@ -286,7 +430,8 @@ reports/
     console.log('Next steps:');
     console.log('  1. Review .validation/config.json');
     console.log('  2. Run `npm run validate` to validate your project');
-    console.log('  3. Run `npm run validate:architecture` for skeptical analysis\n');
+    console.log('  3. Run `npm run validate:audit` to audit for bloat and unused code');
+    console.log('  4. Run `npm run validate:architecture` for skeptical analysis\n');
   });
 
 // ============================================================================

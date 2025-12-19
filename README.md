@@ -1,15 +1,15 @@
 # @roALAB1/manus-validation-kit
 
-> A 5-layer production-ready validation and optimization system for AI-assisted development.
+> A 6-layer production-ready validation and optimization system for AI-assisted development.
 
 [![GitHub](https://img.shields.io/badge/install-from%20GitHub-blue)](https://github.com/roALAB1/manus-validation-kit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
 
-This validation kit goes far beyond traditional code linting. It provides a **5-layer defense system** that ensures your code is not just correct, but architecturally sound, scalable, and continuously improving.
+This validation kit goes far beyond traditional code linting. It provides a **6-layer defense system** that ensures your code is not just correct, but architecturally sound, scalable, and continuously improving.
 
-### The 5 Layers
+### The 6 Layers
 
 | Layer | Name | Purpose |
 |-------|------|---------|
@@ -18,6 +18,7 @@ This validation kit goes far beyond traditional code linting. It provides a **5-
 | **3** | Learning Loop | Pattern detection & auto-fixing |
 | **4** | Context Optimization | Cleanup, archival & compression |
 | **5** | Token Efficiency | Code as API, Serena, Self-Spec, S²-MAD |
+| **6** | **Codebase Audit** | Evidence-based bloat detection & cleanup |
 
 ## Installation
 
@@ -140,6 +141,46 @@ npm run validate:learn -- --fix
 A pattern becomes auto-fix ready when:
 - **3+ occurrences** of the same pattern
 - **80%+ fix success rate** on previous attempts
+
+## Codebase Audit (Layer 6)
+
+Evidence-based detection of unused code, dependencies, and bloat:
+
+```bash
+# Run full audit
+npm run validate:audit
+
+# Audit specific type
+npm run validate:audit:deps    # Unused dependencies
+npm run validate:audit:files   # Unused files
+
+# Generate cleanup script
+npx manus-validate audit --generate-cleanup
+```
+
+### What Gets Detected
+
+| Type | Tool | Description |
+|------|------|-------------|
+| Unused Dependencies | depcheck | npm packages never imported |
+| Unused Files | unimported | Files not reachable from entry points |
+| Unused Exports | ts-prune | TypeScript exports never used |
+| Duplicate Code | jscpd | Copy-pasted code blocks |
+| Circular Dependencies | madge | Circular import chains |
+
+### Confidence Levels
+
+| Level | Score | Action |
+|-------|-------|--------|
+| 🔴 High | 80-100% | Safe to act on |
+| 🟡 Medium | 60-79% | Needs human review |
+| ⚪ Low | 0-59% | Do not auto-act |
+
+### Key Principle: No Hallucination
+
+Every finding includes **proof from a real tool**. The system never guesses.
+
+See [docs/AUDIT_GUIDE.md](docs/AUDIT_GUIDE.md) for full documentation.
 
 ## Context Optimization (Layer 4)
 
