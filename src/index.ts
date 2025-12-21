@@ -1,7 +1,7 @@
 /**
  * @roALAB1/manus-validation-kit
  * 
- * A 6-layer production-ready validation and optimization system
+ * A 7-layer production-ready validation and optimization system
  * for AI-assisted development.
  * 
  * Layers:
@@ -11,6 +11,7 @@
  * 4. Context Optimization - Cleanup & compression
  * 5. Token Efficiency - Code as API, Serena, Self-Spec, S²-MAD
  * 6. Codebase Audit - Evidence-based bloat detection & cleanup
+ * 7. SDK Guardrails - Verified data structure enforcement
  */
 
 // Core engines
@@ -24,6 +25,9 @@ export { ContextOptimization } from './optimization/ContextOptimization';
 // Audit (Layer 6)
 export { CodebaseAuditEngine } from './audit/CodebaseAuditEngine';
 export { AuditReportGenerator } from './audit/AuditReportGenerator';
+
+// SDK Guardrails (Layer 7)
+export { SDKGuardrailsEngine } from './guardrails/SDKGuardrailsEngine';
 
 // Configuration
 export {
@@ -95,6 +99,21 @@ export type {
   CleanupPlan,
   CleanupAction,
 } from './types/audit';
+
+// SDK Guardrails types (Layer 7)
+export type {
+  SDKGuardrailsConfig,
+  SourceFile,
+  SchemaDefinition,
+  FieldDefinition,
+  EndpointDefinition,
+  CommonMistake,
+  GuardrailRule,
+  SDKValidationResult,
+  SDKViolation,
+  ViolationType,
+  SDKValidationOptions,
+} from './types/sdk-guardrails';
 
 // Utility functions
 export {
@@ -187,5 +206,32 @@ export async function audit(projectPath: string, options?: {
       markdown: mdPath,
       cleanup: cleanupPath,
     },
+  };
+}
+
+/**
+ * Quick start function to run SDK guardrails validation
+ */
+export async function validateSDK(projectPath: string, options?: {
+  configPath?: string;
+  targetPaths?: string[];
+  strictMode?: boolean;
+  severityThreshold?: 'critical' | 'high' | 'medium' | 'low' | 'info';
+}) {
+  const { SDKGuardrailsEngine } = await import('./guardrails/SDKGuardrailsEngine');
+
+  const engine = new SDKGuardrailsEngine();
+  
+  if (options?.configPath) {
+    await engine.loadConfig(options.configPath);
+  }
+
+  const result = await engine.validate(projectPath, options);
+
+  return {
+    result,
+    textReport: engine.generateReport(result, 'text'),
+    markdownReport: engine.generateReport(result, 'markdown'),
+    jsonReport: engine.generateReport(result, 'json'),
   };
 }

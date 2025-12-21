@@ -6,6 +6,7 @@
  * Usage:
  *   manus-validate validate [--all] [--validator=<name>] [--layer=<layer>]
  *   manus-validate audit [--type=<type>] [--generate-cleanup]
+ *   manus-validate sdk [--strict] [--config=<path>]
  *   manus-validate learn [--fix]
  *   manus-validate cleanup [--confirm]
  *   manus-validate init [--force]
@@ -20,13 +21,14 @@ import { LearningLoop } from './learning/LearningLoop';
 import { ContextOptimization } from './optimization/ContextOptimization';
 import { CodebaseAuditEngine } from './audit/CodebaseAuditEngine';
 import { AuditReportGenerator } from './audit/AuditReportGenerator';
+import { SDKGuardrailsEngine } from './guardrails/SDKGuardrailsEngine';
 
 const program = new Command();
 
 program
   .name('manus-validate')
-  .description('6-Layer Validation & Optimization System for AI-Assisted Development')
-  .version('1.1.0');
+  .description('7-Layer Validation & Optimization System for AI-Assisted Development')
+  .version('1.2.0');
 
 // ============================================================================
 // VALIDATE COMMAND
@@ -44,7 +46,7 @@ program
   .action(async (options) => {
     const projectPath = process.cwd();
     
-    console.log('\n🚀 Manus Validation Kit v1.1.0\n');
+    console.log('\n🚀 Manus Validation Kit v1.2.0\n');
     console.log(`📁 Project: ${projectPath}\n`);
 
     let exitCode = 0;
@@ -188,6 +190,89 @@ program
   });
 
 // ============================================================================
+// SDK COMMAND (Layer 7)
+// ============================================================================
+
+program
+  .command('sdk')
+  .description('Run SDK guardrails validation against verified schemas')
+  .option('-c, --config <path>', 'Path to SDK guardrails config file')
+  .option('-t, --target <paths>', 'Comma-separated paths to scan')
+  .option('-o, --output <format>', 'Output format (text, json, markdown)', 'markdown')
+  .option('--strict', 'Fail on any violation')
+  .option('--severity <level>', 'Minimum severity to report (critical, high, medium, low, info)', 'medium')
+  .option('--ci', 'Run in CI mode (exit with error code on failure)')
+  .option('--init', 'Generate a blank SDK guardrails template')
+  .action(async (options) => {
+    const projectPath = process.cwd();
+    
+    console.log('\n🛡️  Manus Validation Kit - SDK Guardrails (Layer 7)\n');
+    console.log(`📁 Project: ${projectPath}\n`);
+
+    try {
+      const engine = new SDKGuardrailsEngine();
+
+      // Init mode: generate template
+      if (options.init) {
+        const projectName = path.basename(projectPath);
+        const template = engine.createTemplate(projectName);
+        
+        const configDir = path.join(projectPath, '.validation');
+        if (!fs.existsSync(configDir)) {
+          fs.mkdirSync(configDir, { recursive: true });
+        }
+        
+        const configPath = path.join(configDir, 'sdk-guardrails.json');
+        fs.writeFileSync(configPath, JSON.stringify(template, null, 2));
+        
+        console.log(`✅ Created SDK guardrails template: .validation/sdk-guardrails.json`);
+        console.log('\nNext steps:');
+        console.log('  1. Edit the template with your verified schemas');
+        console.log('  2. Run `npm run validate:sdk` to validate your code');
+        return;
+      }
+
+      // Load config
+      if (options.config) {
+        await engine.loadConfig(options.config);
+      }
+
+      // Run validation
+      const targetPaths = options.target?.split(',');
+      const result = await engine.validate(projectPath, {
+        configPath: options.config,
+        targetPaths,
+        strictMode: options.strict,
+        severityThreshold: options.severity,
+      });
+
+      // Generate report
+      const report = engine.generateReport(result, options.output);
+      console.log(report);
+
+      // Save report
+      saveReport(projectPath, 'sdk-guardrails', result);
+
+      // CI mode
+      if (options.ci && result.status === 'failed') {
+        console.log(`\n❌ SDK validation failed with score ${result.score}/100`);
+        process.exit(1);
+      }
+
+      // Summary
+      console.log('\n' + '─'.repeat(60));
+      console.log(`Status: ${result.status.toUpperCase()}`);
+      console.log(`Score: ${result.score}/100`);
+      console.log(`Violations: ${result.violationsFound}`);
+      console.log('─'.repeat(60) + '\n');
+
+    } catch (error) {
+      console.error('\n❌ SDK validation failed:', error);
+      process.exit(1);
+    }
+  });
+
+// ============================================================================
 // LEARN COMMAND
 // ============================================================================
 
@@ -288,7 +373,7 @@ program
     const validationDir = path.join(projectPath, '.validation');
     const configPath = path.join(validationDir, 'config.json');
 
-    console.log('\n🔧 Initializing Manus Validation Kit...\n');
+    console.log('\n🔧 Initializing Manus Validation Kit v1.2.0...\n');
 
     // Check if already initialized
     if (fs.existsSync(configPath) && !options.force) {
@@ -313,7 +398,7 @@ program
 
     // Create default config
     const defaultConfig = {
-      version: '1.1.0',
+      version: '1.2.0',
       validators: {
         typescript: { enabled: true, weight: 0.96 },
         eslint: { enabled: true, weight: 0.92 },
@@ -349,6 +434,10 @@ program
           packages: ['@types/*'],
           patterns: ['*.config.js', '*.config.ts', '*.d.ts', '*.test.ts', '*.spec.ts'],
         },
+      },
+      sdkGuardrails: {
+        enabled: false,
+        configPath: '.validation/sdk-guardrails.json',
       },
     };
 
@@ -387,6 +476,7 @@ cleanup.sh
 !config.json
 !keep.json
 !patterns.json
+!sdk-guardrails.json
 `;
     fs.writeFileSync(gitignorePath, gitignoreContent);
     console.log(`  📄 Created .validation/.gitignore`);
@@ -405,6 +495,8 @@ cleanup.sh
           'validate:audit': 'manus-validate audit',
           'validate:audit:deps': 'manus-validate audit --type=dependencies',
           'validate:audit:files': 'manus-validate audit --type=files',
+          'validate:sdk': 'manus-validate sdk',
+          'validate:sdk:init': 'manus-validate sdk --init',
           'validate:learn': 'manus-validate learn',
           'validate:cleanup': 'manus-validate cleanup',
         };
@@ -431,7 +523,8 @@ cleanup.sh
     console.log('  1. Review .validation/config.json');
     console.log('  2. Run `npm run validate` to validate your project');
     console.log('  3. Run `npm run validate:audit` to audit for bloat and unused code');
-    console.log('  4. Run `npm run validate:architecture` for skeptical analysis\n');
+    console.log('  4. Run `npm run validate:sdk:init` to create SDK guardrails template');
+    console.log('  5. Run `npm run validate:architecture` for skeptical analysis\n');
   });
 
 // ============================================================================

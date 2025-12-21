@@ -1,24 +1,25 @@
 # @roALAB1/manus-validation-kit
 
-> A 6-layer production-ready validation and optimization system for AI-assisted development.
+> A 7-layer production-ready validation and optimization system for AI-assisted development.
 
 [![GitHub](https://img.shields.io/badge/install-from%20GitHub-blue)](https://github.com/roALAB1/manus-validation-kit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
 
-This validation kit goes far beyond traditional code linting. It provides a **6-layer defense system** that ensures your code is not just correct, but architecturally sound, scalable, and continuously improving.
+This validation kit goes far beyond traditional code linting. It provides a **7-layer defense system** that ensures your code is not just correct, but architecturally sound, scalable, and continuously improving.
 
-### The 6 Layers
+### The 7 Layers
 
 | Layer | Name | Purpose |
-|-------|------|---------|
+|-------|------|---------||
 | **1** | Code Validation | 10 validators with consensus scoring |
 | **2** | Skeptical Reasoning | Architectural soundness & scalability analysis |
 | **3** | Learning Loop | Pattern detection & auto-fixing |
 | **4** | Context Optimization | Cleanup, archival & compression |
 | **5** | Token Efficiency | Code as API, Serena, Self-Spec, S²-MAD |
-| **6** | **Codebase Audit** | Evidence-based bloat detection & cleanup |
+| **6** | Codebase Audit | Evidence-based bloat detection & cleanup |
+| **7** | **SDK Guardrails** | Verified data structure enforcement |
 
 ## Installation
 
